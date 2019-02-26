@@ -11,13 +11,20 @@ services:
     volumes:
      - pgdata_test:/var/lib/postgresql/data
   app:
-    build: .
-    command: /bin/bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    build: 
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    command: /bin/bash -c -l "bundle exec foreman s"
+    environment: 
+      RAILS_ENV: development
     volumes:
-    - .:/app
+      - ../:/app
+      - node_modules:/app/node_modules
+      - ../package.json:/app/package.json
     ports:
      - "3000:3000"
     depends_on:
       - db
 volumes:
   pgdata_test:
+  node_modules:

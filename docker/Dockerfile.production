@@ -1,0 +1,41 @@
+FROM ruby:2.6
+
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+
+RUN apt-get update -qq && apt-get install -y nodejs postgresql-client yarn vim time
+
+ENV RAILS_ENV='production'
+ENV RACK_ENV='production'
+
+RUN mkdir /app
+WORKDIR /app
+COPY Gemfile .
+COPY Gemfile.lock .
+RUN bundle install
+
+COPY yarn.lock .
+COPY package.json .
+COPY node_modules ./node_modules
+RUN yarn install
+
+COPY app ./app
+COPY bin ./bin
+COPY db ./db
+COPY config ./config
+COPY lib ./lib
+COPY public ./public
+COPY config.ru .
+COPY Rakefile .
+COPY vendor ./vendor
+RUN mkdir ./tmp
+
+ENV SECRET_KEY_BASE='sitekcode'
+RUN /bin/bash -l -c "bundle exec rails assets:precompile"
+
+EXPOSE 3000
+CMD /bin/bash -l -c  "bundle exec puma -C config/puma.rb"
+#CMD sleep infinity
+
+
