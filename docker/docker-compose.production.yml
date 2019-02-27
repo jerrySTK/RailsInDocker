@@ -16,9 +16,11 @@ services:
       dockerfile: docker/Dockerfile.production
     volumes:
       - node_modules:/app/node_modules
+      - ../public:/app/public
     environment: 
       APP_DATABASE_PASSWORD: sitekcode
       APP_DATABASE_USER: postgres
+      RAILS_ENV: production
     ports:
      - "3000:3000"
     depends_on:

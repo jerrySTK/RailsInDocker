@@ -1,3 +1,22 @@
 const { environment } = require('@rails/webpacker')
+const webpack = require('webpack');
+
+environment.plugins.prepend('jquery',new webpack.ProvidePlugin({
+    $: 'jquery',
+    jQuery: 'jquery',
+    jquery: 'jquery',
+    'window.jQuery': 'jquery',
+    Popper: ['popper.js','default']
+}));
+
+environment.loaders.append('jquery', {
+    test: require.resolve('jquery'),
+    use: [{
+      loader: 'expose-loader',
+      options: '$'
+    }]
+  });
+
+
 
 module.exports = environment

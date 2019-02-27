@@ -6,8 +6,7 @@ RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources
 
 RUN apt-get update -qq && apt-get install -y nodejs postgresql-client yarn vim time
 
-ENV RAILS_ENV='production'
-ENV RACK_ENV='production'
+
 
 RUN mkdir /app
 WORKDIR /app
@@ -18,8 +17,6 @@ RUN bundle install
 COPY yarn.lock .
 COPY package.json .
 COPY node_modules ./node_modules
-RUN yarn install
-
 COPY app ./app
 COPY bin ./bin
 COPY db ./db
@@ -29,10 +26,14 @@ COPY public ./public
 COPY config.ru .
 COPY Rakefile .
 COPY vendor ./vendor
+COPY .babelrc .
+COPY .postcssrc.yml .
 RUN mkdir ./tmp
 
 ENV SECRET_KEY_BASE='sitekcode'
-RUN /bin/bash -l -c "bundle exec rails assets:precompile"
+ENV RAILS_ENV='development'
+ENV RACK_ENV='development'
+RUN yarn install
 
 EXPOSE 3000
 CMD /bin/bash -l -c  "bundle exec puma -C config/puma.rb"
